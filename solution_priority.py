@@ -25,6 +25,7 @@ class Solution:
         self.id = None
         self.distance = None
         self.time = None
+        self.robots_number = None
         self.metrics = [0, 0, 0]
         self.dominated_count = 0
         self.dominated_solutions = []
@@ -38,7 +39,7 @@ class Solution:
         """
         Retorna os objetivos como uma lista, no formato esperado para cálculo de hipervolume.
         """
-        return [self.distance, self.time, self.max_priority_time]
+        return [self.distance, self.time, self.robots_number]
 
     # # Função auxiliar para calcular distâncias
     # def calculate_distance_and_time(self, point1, point2, metric=DISTANCE_METRIC):
@@ -128,7 +129,7 @@ class Solution:
 
         # Penalidade por exceder a capacidade da bateria
         if travel_time > battery_time:
-            return float('inf')  # Penalidade se a bateria for excedida
+            return float('inf'), float('inf')  # Penalidade se a bateria for excedida
 
         return travel_distance, inspection_time + travel_time
 
@@ -199,6 +200,7 @@ class Solution:
         total_distance = 0
         last_time = 0
         max_time = 0
+        num_robots = 0
 
         # Itera sobre os robôs e suas respectivas alocações
         for robot_idx, task_list in enumerate(self.allocations):
@@ -215,14 +217,18 @@ class Solution:
 
             if last_time > max_time:
                 max_time = last_time
-            else:
-                continue
+
+            if robot_idx + 1 > num_robots:
+                num_robots = robot_idx + 1
 
         # Atualiza as métricas da solução
         self.distance = total_distance
         self.metrics[0] = total_distance
         self.time = max_time
         self.metrics[1] = max_time
+        self.robots_number = num_robots
+        self.metrics[2] = num_robots
+
         return total_distance, max_time
     
     
@@ -235,14 +241,14 @@ class Solution:
     def print_solution_metrics(self, label="Solution"):
         print(f"{label} distance: {self.distance}")
         print(f"{label} time: {self.time}")
-        print(f"{label} max_priority_time: {self.max_priority_time}")
+        print(f"{label} robots_number: {self.robots_number}")
         print("---------------------------------------------------------")
 
     def to_dict(self):
         return {
             "distance": self.distance,
             "time": self.time,
-            "max_priority_time": self.max_priority_time,
+            "robots_number": self.robots_number,
             "robots": [robot.to_dict() for robot in self.robots],
             "tasks": [task.to_dict() for task in self.tasks] if self.tasks else None,
         }
@@ -272,13 +278,13 @@ class Solution:
         # Exemplo: Combinação ponderada de distância, tempo e balanceamento
         weight_distance = 0.5
         weight_time = 0.3
-        priority_time = 0.2
+        weight_robots_number = 0.2
 
         # Inverter métricas para minimizar
         improvement_metric = (
             self.distance * weight_distance +
             self.time * weight_time +
-            self.max_priority_time * priority_time
+            self.robots_number * weight_robots_number
         )
 
         return improvement_metric

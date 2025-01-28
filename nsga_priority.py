@@ -21,15 +21,15 @@ import vnd_priority
 DISTANCE_METRIC = 'euclidean'
 
 # INICIALIZANDO ROBÔS
-battery_times = [10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000]
+battery_times = 900
 velocity = 2
-initial_positions = [(150, 150), (150, 150), (150, 150), (150, 150), (150, 150), (150, 150), (150, 150), (150, 150), (150, 150), (150, 150)]  # Exemplo de posições iniciais
+initial_positions = (20, 20) # Exemplo de posições iniciais
 num_robots = 10
 pop_size = 50
 time_limit = 10
 ref_point = [30000, 8000, 8000]
 
-robots = [Robot(i, battery_times[i], velocity, initial_position=initial_positions[i]) for i in range(num_robots)]
+robots = [Robot(i, battery_times, velocity, initial_position=initial_positions) for i in range(num_robots)]
 
 tasks = task_priority.tasks
 
@@ -360,12 +360,12 @@ def plot_metrics_evolution(evolutions, normalize=False):
 
     # Tempo de Conclusão das Tarefas Prioritárias
     plt.subplot(3, 1, 3)
-    plt.plot(evolutions["best_priority_time"], label="Melhor Tempo Prioritário", linestyle="--")
-    plt.plot(evolutions["worst_priority_time"], label="Pior Tempo Prioritário", linestyle="--")
-    plt.plot(evolutions["mean_priority_time"], label="Média Tempo Prioritário", linestyle="-")
+    plt.plot(evolutions["best_priority_time"], label="Melhor Quantidade de Robôs", linestyle="--")
+    plt.plot(evolutions["worst_priority_time"], label="Pior Quantidade de Robôs", linestyle="--")
+    plt.plot(evolutions["mean_priority_time"], label="Média Quantidade de Robôs", linestyle="-")
     plt.xlabel("Geração")
-    plt.ylabel("Tempo Prioritário")
-    plt.title(f"Evolução do Tempo das Tarefas Prioritárias{title_suffix}")
+    plt.ylabel("Número de Robôs")
+    plt.title(f"Evolução da Quantidade de Robôs{title_suffix}")
     plt.legend()
     plt.grid()
 
