@@ -41,19 +41,6 @@ class Solution:
         """
         return [self.distance, self.time, self.robots_number]
 
-    # # Função auxiliar para calcular distâncias
-    # def calculate_distance_and_time(self, point1, point2, metric=DISTANCE_METRIC):
-    #     if metric == 'manhattan':
-    #         distance = abs(point1[0] - point2[0]) + abs(point1[1] - point2[1])
-    #         time = distance / velocity
-    #         return distance, time
-    #     elif metric == 'euclidean':
-    #         distance = np.sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2)
-    #         time = distance / velocity
-    #         return distance, time
-    #     else:
-    #         raise ValueError("Invalid metric. Use 'euclidean' or 'manhattan'.")
-
     # LÓGICA: A FUNÇÃO VAI ALOCANDO, PARA CADA ROBÕ ALTERNADAMENTE, A TASK MAIS PRÓXIMA A ELE RESPEITANDO SUA CAPACIDADE    
     def greedy_allocate_tasks(self, robots, tasks):
         remaining_tasks = tasks[:]
@@ -132,58 +119,6 @@ class Solution:
             return float('inf'), float('inf')  # Penalidade se a bateria for excedida
 
         return travel_distance, inspection_time + travel_time
-
-    
-    # def calculate_robot_execution_time(self, initial_position, robot_tasks, distance_matrix):
-    #     """
-    #     Calcula o tempo total de execução para um único robô.
-
-    #     Args:
-    #         initial_position (tuple): Coordenadas iniciais do robô.
-    #         robot_tasks (list): Lista de tarefas alocadas ao robô.
-    #         distance_matrix (np.ndarray): Matriz de distâncias entre tarefas.
-
-    #     Returns:
-    #         float: Tempo total de execução do robô.
-    #     """
-    #     inspection_time = sum(task.inspection_time for task in robot_tasks)
-    #     travel_time = 0
-
-    #     if robot_tasks:
-    #         task_indices = [task.id for task in robot_tasks]
-
-    #         # Tempo de deslocamento da posição inicial até a primeira tarefa
-    #         travel_time += calculate_distance_and_time(initial_position, robot_tasks[0].coordinates, self.velocity, DISTANCE_METRIC)
-
-    #         # Tempo de deslocamento entre tarefas
-    #         for i in range(len(task_indices) - 1):
-    #             travel_time += distance_matrix[task_indices[i]][task_indices[i + 1]]
-
-    #     return inspection_time + travel_time
-
-
-    
-    #SEGUNDA VERSÃO: LEVA EM CONTA O TEMPO DO ROBÔ MAIS DEMORADO
-    # Calcula o tempo de execução total com base no robô mais lento
-    # def calculate_execution_time(self, distance_matrix):
-    #     """
-    #     Calcula o tempo total de execução com base no robô mais lento.
-
-    #     Args:
-    #         distance_matrix (np.ndarray): Matriz de distâncias entre tarefas.
-
-    #     Returns:
-    #         float: O tempo de execução do robô mais lento.
-    #     """
-    #     max_time = max(
-    #         self.calculate_robot_execution_distance_and_time(
-    #             robot.initial_position, robot_tasks, distance_matrix
-    #         )[1]
-    #         for robot, robot_tasks in zip(self.robots, self.allocations)
-    #     )
-    #     self.time = max_time
-    #     self.metrics[1] = max_time
-    #     return max_time
 
         
     # Calcula a distância total de execução
@@ -276,8 +211,8 @@ class Solution:
             float: Valor da métrica de melhoria.
         """
         # Exemplo: Combinação ponderada de distância, tempo e balanceamento
-        weight_distance = 0.5
-        weight_time = 0.3
+        weight_distance = 0.3
+        weight_time = 0.5
         weight_robots_number = 0.2
 
         # Inverter métricas para minimizar
@@ -314,7 +249,7 @@ class Solution:
 
                 # Escolhe tarefas baseadas em distância
                 distances = [
-                    (task, calculate_distance_and_time(robot.initial_position, task.coordinates))
+                    (task, calculate_distance_and_time(robot.initial_position, task.coordinates, self.robots[robot_idx].velocity))
                     for task in remaining_tasks
                 ]
                 distances.sort(key=lambda x: x[1])
