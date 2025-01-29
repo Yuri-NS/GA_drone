@@ -360,12 +360,12 @@ def plot_metrics_evolution(evolutions, normalize=False):
 
     # Tempo de Conclusão das Tarefas Prioritárias
     plt.subplot(3, 1, 3)
-    plt.plot(evolutions["best_priority_time"], label="Melhor Quantidade de Robôs", linestyle="--")
-    plt.plot(evolutions["worst_priority_time"], label="Pior Quantidade de Robôs", linestyle="--")
-    plt.plot(evolutions["mean_priority_time"], label="Média Quantidade de Robôs", linestyle="-")
+    plt.plot(evolutions["best_priority_time"], label="Melhor Consumo de Bateria", linestyle="--")
+    plt.plot(evolutions["worst_priority_time"], label="Pior Consumo de Bateria", linestyle="--")
+    plt.plot(evolutions["mean_priority_time"], label="Média Consumo de Bateria", linestyle="-")
     plt.xlabel("Geração")
-    plt.ylabel("Número de Robôs")
-    plt.title(f"Evolução da Quantidade de Robôs{title_suffix}")
+    plt.ylabel("Consumo de Bateria")
+    plt.title(f"Evolução de Consumo de Bateria{title_suffix}")
     plt.legend()
     plt.grid()
 

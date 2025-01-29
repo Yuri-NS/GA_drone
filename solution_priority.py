@@ -25,7 +25,7 @@ class Solution:
         self.id = None
         self.distance = None
         self.time = None
-        self.robots_number = None
+        self.balance_load = None
         self.metrics = [0, 0, 0]
         self.dominated_count = 0
         self.dominated_solutions = []
@@ -149,6 +149,7 @@ class Solution:
 
             total_distance += robot_distance
             last_time = robot_time
+            self.robots[robot_idx].battery_time = self.robots[robot_idx].initial_battery_time - robot_time
 
             if last_time > max_time:
                 max_time = last_time
@@ -161,29 +162,48 @@ class Solution:
         self.metrics[0] = total_distance
         self.time = max_time
         self.metrics[1] = max_time
-        self.robots_number = num_robots
-        self.metrics[2] = num_robots
+        # self.robots_number = num_robots
+        # self.metrics[2] = num_robots
 
         return total_distance, max_time
     
-    
+
+    # SEGUNDA VERSÃO DO BALANCE LOAD: baseado na energia restante de cada robô
+    def calculate_balance_load(self):
+        """
+        Calcula o balanceamento de carga baseado na energia remanescente dos robôs.
+
+        Args:
+            distance_matrix (np.ndarray): Matriz de distâncias entre tarefas.
+
+        Returns:
+            float: O desvio padrão das energias restantes entre os robôs.
+        """
+        if self.robots:
+            self.balance_load = np.std([robot.battery_time for robot in self.robots]) if all(robot.battery_time for robot in self.robots) else 0
+        else:
+            self.balance_load = 0
+        self.metrics[2] = self.balance_load
+        return self.balance_load
+
     # Calcula todas as métricas principais
     def calculate_metrics(self, distance_matrix):
         self.calculate_execution_distance_and_time(distance_matrix)
+        self.calculate_balance_load()
         # self.calculate_execution_time(distance_matrix)
     
     # Exibe métricas da solução
     def print_solution_metrics(self, label="Solution"):
         print(f"{label} distance: {self.distance}")
         print(f"{label} time: {self.time}")
-        print(f"{label} robots_number: {self.robots_number}")
+        print(f"{label} balance_load: {self.balance_load}")
         print("---------------------------------------------------------")
 
     def to_dict(self):
         return {
             "distance": self.distance,
             "time": self.time,
-            "robots_number": self.robots_number,
+            "robots_number": self.balance_load,
             "robots": [robot.to_dict() for robot in self.robots],
             "tasks": [task.to_dict() for task in self.tasks] if self.tasks else None,
         }
@@ -213,13 +233,13 @@ class Solution:
         # Exemplo: Combinação ponderada de distância, tempo e balanceamento
         weight_distance = 0.3
         weight_time = 0.5
-        weight_robots_number = 0.2
+        weight_balance_load = 0.2
 
         # Inverter métricas para minimizar
         improvement_metric = (
             self.distance * weight_distance +
             self.time * weight_time +
-            self.robots_number * weight_robots_number
+            self.balance_load * weight_balance_load
         )
 
         return improvement_metric
