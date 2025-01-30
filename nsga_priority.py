@@ -23,11 +23,11 @@ DISTANCE_METRIC = 'euclidean'
 # INICIALIZANDO ROBÔS
 battery_times = 900
 velocity = 2
-initial_positions = (13, 124) # Exemplo de posições iniciais
+initial_positions = (29, 136) # Exemplo de posições iniciais
 num_robots = 10
 pop_size = 50
 time_limit = 100
-ref_point = [15000, 8000, 2000]
+ref_point = [15000, 2000, 2000]
 
 robots = [Robot(i, battery_times, velocity, initial_position=initial_positions) for i in range(num_robots)]
 

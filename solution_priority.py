@@ -117,8 +117,8 @@ class Solution:
 
         # Penalidade por exceder a capacidade da bateria
         if travel_time > battery_time:
-            #return float('inf'), float('inf')  # Penalidade se a bateria for excedida
-            return battery_time * 2, battery_time * 2  # Penalidade se a bateria for excedida
+            return float('inf'), float('inf')  # Penalidade se a bateria for excedida
+            #return battery_time * 2, battery_time * 2  # Penalidade se a bateria for excedida
 
         return travel_distance, inspection_time + travel_time
 
