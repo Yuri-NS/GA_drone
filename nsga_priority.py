@@ -23,11 +23,11 @@ DISTANCE_METRIC = 'euclidean'
 # INICIALIZANDO ROBÔS
 battery_times = 900
 velocity = 2
-initial_positions = (20, 20) # Exemplo de posições iniciais
+initial_positions = (13, 124) # Exemplo de posições iniciais
 num_robots = 10
 pop_size = 50
-time_limit = 10
-ref_point = [30000, 8000, 8000]
+time_limit = 100
+ref_point = [15000, 8000, 2000]
 
 robots = [Robot(i, battery_times, velocity, initial_position=initial_positions) for i in range(num_robots)]
 
@@ -290,9 +290,9 @@ def analyze_metrics_evolution(metrics_log, normalize=False):
         "best_time": [],
         "worst_time": [],
         "mean_time": [],
-        "best_priority_time": [],
-        "worst_priority_time": [],
-        "mean_priority_time": [],
+        "best_balance_load": [],
+        "worst_balance_load": [],
+        "mean_balance_load": [],
         "diversity": []
     }
 
@@ -313,9 +313,9 @@ def analyze_metrics_evolution(metrics_log, normalize=False):
         evolutions["best_time"].append(metrics[:, 1].min())
         evolutions["worst_time"].append(metrics[:, 1].max())
         evolutions["mean_time"].append(metrics[:, 1].mean())
-        evolutions["best_priority_time"].append(metrics[:, 2].min())
-        evolutions["worst_priority_time"].append(metrics[:, 2].max())
-        evolutions["mean_priority_time"].append(metrics[:, 2].mean())
+        evolutions["best_balance_load"].append(metrics[:, 2].min())
+        evolutions["worst_balance_load"].append(metrics[:, 2].max())
+        evolutions["mean_balance_load"].append(metrics[:, 2].mean())
 
         # Diversidade (média das distâncias pareadas)
         evolutions["diversity"].append(np.mean(pdist(metrics)))
@@ -360,9 +360,9 @@ def plot_metrics_evolution(evolutions, normalize=False):
 
     # Tempo de Conclusão das Tarefas Prioritárias
     plt.subplot(3, 1, 3)
-    plt.plot(evolutions["best_priority_time"], label="Melhor Consumo de Bateria", linestyle="--")
-    plt.plot(evolutions["worst_priority_time"], label="Pior Consumo de Bateria", linestyle="--")
-    plt.plot(evolutions["mean_priority_time"], label="Média Consumo de Bateria", linestyle="-")
+    plt.plot(evolutions["best_balance_load"], label="Melhor Consumo de Bateria", linestyle="--")
+    plt.plot(evolutions["worst_balance_load"], label="Pior Consumo de Bateria", linestyle="--")
+    plt.plot(evolutions["mean_balance_load"], label="Média Consumo de Bateria", linestyle="-")
     plt.xlabel("Geração")
     plt.ylabel("Consumo de Bateria")
     plt.title(f"Evolução de Consumo de Bateria{title_suffix}")
@@ -382,7 +382,7 @@ class Pareto_Front:
         self.iterations = []
         self.distances = []
         self.times = []
-        self.max_priority_times = []
+        self.max_balance_loads = []
     
     def add_solution(self, new_solution):
         self.solutions.append(new_solution)
@@ -460,7 +460,7 @@ def log_metrics_func(solution, iteration, pareto_front):
     pareto_front.iterations.append(iteration)
     pareto_front.distances.append(solution.distance)
     pareto_front.times.append(solution.time)
-    pareto_front.max_priority_time.append(solution.max_priority_time)
+    pareto_front.max_balance_loads.append(solution.balance_load)
 
 
 def dominates_solution(sol1, sol2, improvement = 1.01):
@@ -468,8 +468,8 @@ def dominates_solution(sol1, sol2, improvement = 1.01):
         # Compara distância, tempo e balanceamento de carga das soluções
         return (sol1.distance <= sol2.distance and 
                 sol1.time <= sol2.time and
-                sol1.max_priority_time <= sol2.max_priority_time and
-                (sol1.distance < improvement*sol2.distance or sol1.time < improvement*sol2.time or sol1.max_priority_time < improvement*sol2.max_priority_time))
+                sol1.max_balance_load <= sol2.max_balance_load and
+                (sol1.distance < improvement*sol2.distance or sol1.time < improvement*sol2.time or sol1.max_balance_load < improvement*sol2.max_balance_load))
 
 
 

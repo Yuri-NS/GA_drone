@@ -487,7 +487,7 @@ def apply_vnd(solution, robots, distance_matrix):
     """
     improved = True
     tolerance = 0.98
-    initial_position = (150, 150)
+    initial_position = (13, 124)
 
     while improved:
         improved = False

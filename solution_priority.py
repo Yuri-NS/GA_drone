@@ -25,6 +25,7 @@ class Solution:
         self.id = None
         self.distance = None
         self.time = None
+        self.robots_number = None
         self.balance_load = None
         self.metrics = [0, 0, 0]
         self.dominated_count = 0
@@ -116,7 +117,8 @@ class Solution:
 
         # Penalidade por exceder a capacidade da bateria
         if travel_time > battery_time:
-            return float('inf'), float('inf')  # Penalidade se a bateria for excedida
+            #return float('inf'), float('inf')  # Penalidade se a bateria for excedida
+            return battery_time * 2, battery_time * 2  # Penalidade se a bateria for excedida
 
         return travel_distance, inspection_time + travel_time
 
@@ -157,13 +159,15 @@ class Solution:
             if robot_idx + 1 > num_robots:
                 num_robots = robot_idx + 1
 
+            #print(f"battery {self.robots[robot_idx].battery_time}")
+
         # Atualiza as métricas da solução
         self.distance = total_distance
         self.metrics[0] = total_distance
         self.time = max_time
         self.metrics[1] = max_time
-        # self.robots_number = num_robots
-        # self.metrics[2] = num_robots
+        #self.robots_number = num_robots
+        #self.metrics[2] = num_robots
 
         return total_distance, max_time
     
@@ -234,6 +238,7 @@ class Solution:
         weight_distance = 0.3
         weight_time = 0.5
         weight_balance_load = 0.2
+        weight_robots_number = 0.2
 
         # Inverter métricas para minimizar
         improvement_metric = (
