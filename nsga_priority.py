@@ -342,7 +342,7 @@ def plot_metrics_evolution(evolutions, normalize=False):
     plt.plot(evolutions["worst_distance"], label="Pior Distância", linestyle="--")
     plt.plot(evolutions["mean_distance"], label="Média Distância", linestyle="-")
     plt.xlabel("Geração")
-    plt.ylabel("Distância")
+    plt.ylabel("Distância (Metros)")
     plt.title(f"Evolução da Distância{title_suffix}")
     plt.legend()
     plt.grid()
@@ -353,19 +353,19 @@ def plot_metrics_evolution(evolutions, normalize=False):
     plt.plot(evolutions["worst_time"], label="Pior Tempo", linestyle="--")
     plt.plot(evolutions["mean_time"], label="Média Tempo", linestyle="-")
     plt.xlabel("Geração")
-    plt.ylabel("Tempo Total")
+    plt.ylabel("Tempo Total (Segundos)")
     plt.title(f"Evolução do Tempo Total{title_suffix}")
     plt.legend()
     plt.grid()
 
     # Tempo de Conclusão das Tarefas Prioritárias
     plt.subplot(3, 1, 3)
-    plt.plot(evolutions["best_balance_load"], label="Melhor Consumo de Bateria", linestyle="--")
-    plt.plot(evolutions["worst_balance_load"], label="Pior Consumo de Bateria", linestyle="--")
-    plt.plot(evolutions["mean_balance_load"], label="Média Consumo de Bateria", linestyle="-")
+    plt.plot(evolutions["best_balance_load"], label="Melhor Balanceamento de Energia", linestyle="--")
+    plt.plot(evolutions["worst_balance_load"], label="Pior Balanceamento de Energia", linestyle="--")
+    plt.plot(evolutions["mean_balance_load"], label="Média Balanceamento de Energia", linestyle="-")
     plt.xlabel("Geração")
-    plt.ylabel("Consumo de Bateria")
-    plt.title(f"Evolução de Consumo de Bateria{title_suffix}")
+    plt.ylabel("Balanceamento de Energia (Desvio Padrão)")
+    plt.title(f"Evolução de Balanceamento de Energia{title_suffix}")
     plt.legend()
     plt.grid()
 
@@ -382,7 +382,7 @@ class Pareto_Front:
         self.iterations = []
         self.distances = []
         self.times = []
-        self.max_balance_loads = []
+        self.balance_loads = []
     
     def add_solution(self, new_solution):
         self.solutions.append(new_solution)
@@ -460,7 +460,7 @@ def log_metrics_func(solution, iteration, pareto_front):
     pareto_front.iterations.append(iteration)
     pareto_front.distances.append(solution.distance)
     pareto_front.times.append(solution.time)
-    pareto_front.max_balance_loads.append(solution.balance_load)
+    pareto_front.balance_loads.append(solution.balance_load)
 
 
 def dominates_solution(sol1, sol2, improvement = 1.01):
@@ -468,8 +468,8 @@ def dominates_solution(sol1, sol2, improvement = 1.01):
         # Compara distância, tempo e balanceamento de carga das soluções
         return (sol1.distance <= sol2.distance and 
                 sol1.time <= sol2.time and
-                sol1.max_balance_load <= sol2.max_balance_load and
-                (sol1.distance < improvement*sol2.distance or sol1.time < improvement*sol2.time or sol1.max_balance_load < improvement*sol2.max_balance_load))
+                sol1.balance_load <= sol2.balance_load and
+                (sol1.distance < improvement*sol2.distance or sol1.time < improvement*sol2.time or sol1.balance_load < improvement*sol2.balance_load))
 
 
 
@@ -521,7 +521,7 @@ def genetic_algorithm_vnd(robots, pop_size, time_limit, population, local, pop_k
 
         # Melhor solução
         best_solution = population[0]
-        # print(f"Geração {generation}: Melhor distância: {best_solution.distance}, Melhor tempo: {best_solution.time}, Melhor max_priority_time: {best_solution.max_priority_time}")
+        #print(f"Geração {generation}: Melhor distância: {best_solution.distance}, Melhor tempo: {best_solution.time}, Melhor balanceamento de carga: {best_solution.balance_load}")
 
         generation += 1
     """ for sol in population:
@@ -623,7 +623,48 @@ def genetic_algorithm_standard(robots, pop_size, time_limit, population, local, 
 
 # genetic_algorithm(robots, tasks, pop_size, time_limit)
 
+def best_results(final_population):
 
+    best_distance = float('inf')
+    best_time = float('inf')
+    best_balance_load = float('inf')
+
+    # Acessando os atributos
+    for i, sol in enumerate(final_population):
+
+        if best_distance > sol.distance:
+            best_distance = sol.distance
+            sol_best_distance = sol
+
+        if best_time > sol.time:
+            best_time = sol.time
+            sol_best_time = sol
+
+        if best_balance_load > sol.balance_load:
+            best_balance_load = sol.balance_load
+            sol_best_balance_load = sol
+
+    print(f"Best distance")
+    for robot_idx, task_list in enumerate(sol_best_distance.allocations):
+        task_coordinates = [task.coordinates for task in task_list]
+        print(f"robot {robot_idx}: task:", task_coordinates)
+
+    print(f"Best time")
+    for robot_idx, task_list in enumerate(sol_best_time.allocations):
+        task_coordinates = [task.coordinates for task in task_list]
+        print(f"robot {robot_idx}: task:", task_coordinates)
+
+    print(f"Best balance")
+    for robot_idx, task_list in enumerate(sol_best_balance_load.allocations):
+        task_coordinates = [task.coordinates for task in task_list]
+        print(f"robot {robot_idx}: task:", task_coordinates)
+
+        
+
+    #best_distance = min(final_population.distance)
+    #best_time = min(final_population.time)
+    #best_balance_load = min(final_population.balance_load)
+    #print(f"Melhor distância: {best_distance}, Melhor distância: {best_distance}, Melhor tempo: {best_time}, Melhor balanceamento: {best_balance_load}")
 
 
 def run_experiments_nsga(robots, tasks, configurations, n_runs, output_dir):
@@ -704,6 +745,10 @@ def run_experiments_nsga(robots, tasks, configurations, n_runs, output_dir):
             pareto_front = [sol.metrics for sol in final_population]
 
             spacing = calculate_spacing(pareto_front)
+
+            best_results(final_population)
+
+            #best_distance_solution, best_time_solution, best_balance_solution = best_results(final_population, robots, tasks)
             # print(f"spacing: {spacing}")
 
             # Salvar resultados no CSV
@@ -726,7 +771,7 @@ def run_experiments_nsga(robots, tasks, configurations, n_runs, output_dir):
 
 
 configurations = [
-    {'pop_size': 50, 'time_limit': time_limit, 'method': 'vnd', 'hybrid_population': False, 'ref_point': [30000, 8000, 8000]},
+    {'pop_size': 50, 'time_limit': time_limit, 'method': 'vnd', 'hybrid_population': False, 'ref_point': [15000, 2000, 2000]},
     # {'pop_size': 50, 'time_limit': time_limit, 'method': 'vnd', 'hybrid_population': True, 'ref_point': [30000, 8000, 8000]},
 ]
 """ configurations = [

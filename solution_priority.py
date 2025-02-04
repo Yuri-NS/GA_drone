@@ -40,7 +40,7 @@ class Solution:
         """
         Retorna os objetivos como uma lista, no formato esperado para cálculo de hipervolume.
         """
-        return [self.distance, self.time, self.robots_number]
+        return [self.distance, self.time, self.balance_load]
 
     # LÓGICA: A FUNÇÃO VAI ALOCANDO, PARA CADA ROBÕ ALTERNADAMENTE, A TASK MAIS PRÓXIMA A ELE RESPEITANDO SUA CAPACIDADE    
     def greedy_allocate_tasks(self, robots, tasks):
@@ -207,7 +207,7 @@ class Solution:
         return {
             "distance": self.distance,
             "time": self.time,
-            "robots_number": self.balance_load,
+            "balance_load": self.balance_load,
             "robots": [robot.to_dict() for robot in self.robots],
             "tasks": [task.to_dict() for task in self.tasks] if self.tasks else None,
         }
@@ -235,9 +235,9 @@ class Solution:
             float: Valor da métrica de melhoria.
         """
         # Exemplo: Combinação ponderada de distância, tempo e balanceamento
-        weight_distance = 0.3
-        weight_time = 0.5
-        weight_balance_load = 0.2
+        weight_distance = 0.2
+        weight_time = 0.4
+        weight_balance_load = 0.4
         weight_robots_number = 0.2
 
         # Inverter métricas para minimizar

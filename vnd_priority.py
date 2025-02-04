@@ -536,7 +536,7 @@ def apply_vnd_movns(solution, robots, distance_matrix):
     improved = True
     improvements = 0
     tolerance = 0.99
-    initial_position = (150, 150)
+    initial_position = (29, 136)
 
     while improved:
         # print(f"Antes: Melhor distância: {solution.distance}, Melhor tempo: {solution.time}, Melhor max_priority_time: {solution.max_priority_time}")
@@ -595,7 +595,7 @@ def apply_vnd_movns_ains(solution, robots, distance_matrix):
     """
     improvements = 0
     tolerance = 0.99
-    initial_position = (150, 150)
+    initial_position = (29, 136)
 
     # Lista de operações de vizinhança disponíveis
     neighborhoods = [
@@ -652,7 +652,7 @@ def apply_best_neighborhood(solution, robots, distance_matrix):
     """
     improvements = 0
     tolerance = 0.99
-    initial_position = (150, 150)
+    initial_position = (29, 136)
 
     # Lista de operações de vizinhança disponíveis
     neighborhoods = [
